@@ -12,30 +12,51 @@ authors: Boris Wetzel
 
 var SortableList = new Class({
 
-    Implements: [Options, Events],
+    Implements: Options,
 
     /* Default options for Sortables - See http://mootools.net/docs/more/Drag/Sortables */
+    /* Not working?
     options: {
         clone: true,
         revert: true,
-        opacity: 0.7
+        opacity: 0.5,
+        onStart: this.sortablesStart,
+        onComplete: this.sortablesComplete
     },
+    */
 
     initialize: function(list, options) {
     
-        this.setOptions(options);
+        /* this.setOptions(options); */
         
         /* Remeber the list */
         this.list = $$(list)[0];
         
         /* For Drag and Drop - See http://mootools.net/docs/more/Drag/Sortables */
-        this.sortables = new Sortables(list, this.options);
+        this.sortables = new Sortables(list, {
+            clone: true,
+            revert: true,
+            opacity: 0.5,
+            onStart: this.sortablesStart,
+            onComplete: this.sortablesComplete
+        });
         
         /* Add tabindex to the list, only the list itself may get focus */
         this.list.setProperty('tabindex', 0);
         
+        /* Add mousedown event to the list to recieve focus */
+        this.list.addEvent('mousedown', function(event) {
+            this.list.focus();
+        }.bind(this));
+        
+        /* Add event listener to the list to monitor its items (recieve virtual focus) */
+        this.list.addEvent('click:relay(li)', function(event, target) {
+            this.list.getChildren('li.active').removeClass('active');
+            target.addClass('active');
+        }.bind(this));
+        
         /* Add active class to the first item in the list (virtual focus)*/
-        this.list.getChildren('li')[0].addClass("active");
+        this.list.getChildren('li')[0].addClass('active');
         
         /* Status of the shift key */
         this.shift = false;
@@ -93,8 +114,8 @@ var SortableList = new Class({
         else
         {
             /* Move the virtual focus up */
-            active.removeClass("active");
-            prev.addClass("active");
+            active.removeClass('active');
+            prev.addClass('active');
         }
     },
     
@@ -113,14 +134,25 @@ var SortableList = new Class({
         {
             /* Swap the items and update sortables */
             this.sortables.addItems(active.clone().inject(next, 'after'));
-            this.sortables.removeItems(active.destroy());
+            this.sortables.removeItems(active).destroy();
         }
         else
         {
             /* Move the virtual focus down */
-            active.removeClass("active");
-            next.addClass("active");
+            active.removeClass('active');
+            next.addClass('active');
         }
+    },
+    
+    sortablesStart: function(element, clone) {
+        this.list.getChildren('li.active').removeClass('active');
+        this.list.getChildren('li.move').removeClass('move');
+        element.addClass('active').addClass('move');
+        clone.addClass('active').addClass('move');
+    },
+    
+    sortablesComplete: function(element) {
+        this.list.getChildren('li.move').removeClass('move');
     }
         
 });
