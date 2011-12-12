@@ -36,23 +36,24 @@ var SortableList = new Class({
         this.sortables = new Sortables(list, {
             clone: true,
             revert: true,
-            opacity: 0.5,
+            opacity: 0,
             onStart: this.sortablesStart,
             onComplete: this.sortablesComplete
         });
         
-        /* Add tabindex to the list, only the list itself may get focus */
+        /* Add tabindex to the list, only the list gets focus */
         this.list.setProperty('tabindex', 0);
         
-        /* Add mousedown event to the list to recieve focus */
-        this.list.addEvent('mousedown', function(event) {
+        /* Add event listeners to monitor the items */
+        this.list.addEvent('mousedown:relay(li)', function(event, target) {
             this.list.focus();
-        }.bind(this));
-        
-        /* Add event listener to the list to monitor its items (recieve virtual focus) */
-        this.list.addEvent('click:relay(li)', function(event, target) {
             this.list.getChildren('li.active').removeClass('active');
-            target.addClass('active');
+            this.list.getChildren('li.move').removeClass('move');
+            target.addClass('active').addClass('move');
+        }.bind(this));
+
+        this.list.addEvent('mouseup:relay(li)', function() {
+            this.list.getChildren('li.move').removeClass('move');
         }.bind(this));
         
         /* Add active class to the first item in the list (virtual focus)*/
@@ -63,18 +64,17 @@ var SortableList = new Class({
         
         /* Add keydown event */
         this.list.addEvent('keydown', function(event) {
-            if (event.code == 16)
-            {
-                this.shift = true;
-                this.list.getChildren('li.active').addClass('move');
-            }
-            else if (event.code == 38)
-            {
-                this.arrowup(event);
-            }
-            else if (event.code == 40)
-            {
-                this.arrowdown(event);
+            switch (event.code) {
+                case 16: 
+                    this.shift = true;
+                    this.list.getChildren('li.active').addClass('move');
+                    break;
+                case 38:
+                    this.arrowup(event);
+                    break;
+                case 40:
+                    this.arrowdown(event);
+                    break;
             }
         }.bind(this));
         
@@ -145,9 +145,6 @@ var SortableList = new Class({
     },
     
     sortablesStart: function(element, clone) {
-        this.list.getChildren('li.active').removeClass('active');
-        this.list.getChildren('li.move').removeClass('move');
-        element.addClass('active').addClass('move');
         clone.addClass('active').addClass('move');
     },
     
