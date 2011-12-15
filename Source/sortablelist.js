@@ -12,23 +12,8 @@ authors: Boris Wetzel
 
 var SortableList = new Class({
 
-    Implements: Options,
-
-    /* Default options for Sortables - See http://mootools.net/docs/more/Drag/Sortables */
-    /* Not working
-    options: {
-        clone: true,
-        revert: true,
-        opacity: 0.5,
-        onStart: this.sortablesStart,
-        onComplete: this.sortablesComplete
-    },
-    */
-
     initialize: function(list, options) {
     
-        /* this.setOptions(options); */
-        
         /* Status of the shift key */
         this.shift = false;
         
@@ -56,21 +41,16 @@ var SortableList = new Class({
         
         /* Add event listeners to monitor the items */
         this.list.addEvent('mousedown:relay(li)', function(event, target) {
-            this.list.getChildren('li.move').removeClass('move');
-            var oldactive = this.list.getChildren('li:focus');
+            this.list.getChildren('li').setProperty('aria-grabbed', 'false').setProperty('tabindex', -1).removeClass('move');
             target.setProperty('tabindex', 0).addClass('move').focus();
-            oldactive.setProperty('tabindex', -1);
         }.bind(this));
 
-        this.list.addEvent('mouseup:relay(li)', function() {
-            this.list.getChildren('li.move').removeClass('move');
-        }.bind(this));
-        
         this.list.addEvent('blur:relay(li)', function() {
+            /* Wait 100ms to check if the focus left the list */
             (function() { 
                 if (this.list.getChildren('li:focus').length == 0)
                 {
-                    this.list.getChildren('li.move').removeClass('move');
+                    this.list.getChildren('li').removeClass('move').setProperty('aria-grabbed', 'false');
                     this.shift = false;
                 }
             }.bind(this)).delay(100);
@@ -97,7 +77,7 @@ var SortableList = new Class({
             if (event.code == 16)
             {
                 this.shift = false;
-                this.list.getChildren('li.move').removeClass('move').setProperty('aria-grabbed', 'false');
+                this.list.getChildren('li').removeClass('move').setProperty('aria-grabbed', 'false');
             }
         }.bind(this));
     },
@@ -116,10 +96,9 @@ var SortableList = new Class({
         if (this.shift)
         {
             /* Swap the two items and update sortables */
-            /* this.sortables.addItems(active.clone().inject(prev, 'before').focus()); */
-            var clone = active.clone();
-            clone.inject(prev, 'before').focus();
+            var clone = active.clone().inject(prev, 'before');
             this.sortables.addItems(clone);
+            clone.focus();
             this.sortables.removeItems(active).destroy();
         }
         else
@@ -144,10 +123,9 @@ var SortableList = new Class({
         if (this.shift)
         {
             /* Swap the items and update sortables */
-            /* this.sortables.addItems(active.clone().inject(next, 'after').focus()); */
-            var clone = active.clone();
-            clone.inject(next, 'after').focus();
+            var clone = active.clone().inject(next, 'after');
             this.sortables.addItems(clone);
+            clone.focus();
             this.sortables.removeItems(active).destroy();
         }
         else
