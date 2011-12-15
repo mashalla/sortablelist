@@ -75,11 +75,11 @@ div.sa_demo_headerScreen {
 	width: 580px;
 }
 /* end common settings 314 */
+
 #sortablelist_demo
 {
     list-style-type: none;
     padding: 0;
-    outline: 0;
 }
 
 #sortablelist_demo li
@@ -99,18 +99,18 @@ div.sa_demo_headerScreen {
     display: block;
 }
 
-#sortablelist_demo:focus li.active
+#sortablelist_demo li:focus
 {
     border: 2px dotted #cc0000;
     padding: 0;
 }
 
-#sortablelist_demo:focus li.active span
+#sortablelist_demo li:focus span
 {
     background: #fff;
 }
 
-#sortablelist_demo:focus li.move span
+#sortablelist_demo li.move span
 {
 	background-color: #ffaaaa !important;
 }
