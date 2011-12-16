@@ -10,6 +10,14 @@ authors: Boris Wetzel
 ...
 */
 
+Element.implement({
+    slFocus: function() {
+        this.getSiblings('li').setProperty('tabindex', -1);
+        this.setProperty('tabindex', 0).focus();
+        return this;
+    }
+});
+
 var SortableList = new Class({
 
     initialize: function(list, options) {
@@ -32,8 +40,8 @@ var SortableList = new Class({
             clone: true,
             revert: true,
             opacity: 0,
-            onStart: this.sortablesStart,
-            onComplete: this.sortablesComplete
+            onStart: function(element, clone) { clone.addClass('move').slFocus(); },
+            onComplete: function(element) { element.removeClass('move').slFocus(); }
         });
                 
         /* Make the first item focusable */
@@ -41,8 +49,8 @@ var SortableList = new Class({
         
         /* Add event listeners to monitor the items */
         this.list.addEvent('mousedown:relay(li)', function(event, target) {
-            this.list.getChildren('li').setProperty('aria-grabbed', 'false').setProperty('tabindex', -1).removeClass('move');
-            target.setProperty('tabindex', 0).addClass('move').focus();
+            this.list.getChildren('li').removeClass('move').setProperty('aria-grabbed', 'false');
+            target.slFocus().addClass('move').setProperty('aria-grabbed', 'false');
         }.bind(this));
 
         this.list.addEvent('blur:relay(li)', function() {
@@ -96,16 +104,13 @@ var SortableList = new Class({
         if (this.shift)
         {
             /* Swap the two items and update sortables */
-            var clone = active.clone().inject(prev, 'before');
-            this.sortables.addItems(clone);
-            clone.focus();
+            this.sortables.addItems(active.clone().inject(prev, 'before').slFocus());
             this.sortables.removeItems(active).destroy();
         }
         else
         {
             /* Move focus up */
-            prev.setProperty('tabindex', 0).focus();
-            active.setProperty('tabindex', -1);
+            prev.slFocus();
         }
     },
     
@@ -123,25 +128,14 @@ var SortableList = new Class({
         if (this.shift)
         {
             /* Swap the items and update sortables */
-            var clone = active.clone().inject(next, 'after');
-            this.sortables.addItems(clone);
-            clone.focus();
+            this.sortables.addItems(active.clone().inject(next, 'after').slFocus());
             this.sortables.removeItems(active).destroy();
         }
         else
         {
             /* Move focus down */
-            next.setProperty('tabindex', 0).focus();
-            active.setProperty('tabindex', -1);
+            next.slFocus();
         }
     },
-    
-    sortablesStart: function(element, clone) {
-        clone.addClass('move').focus();
-    },
-    
-    sortablesComplete: function(element) {
-        element.removeClass('move').focus();
-    }
-        
+       
 });

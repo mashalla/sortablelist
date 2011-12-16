@@ -88,7 +88,7 @@ div.sa_demo_headerScreen {
     cursor: move;
     font-weight: bold;
     border-radius: 6px;
-    outline: 0;
+    /*outline: 0;*/
 }
 
 #sortablelist_demo li span
