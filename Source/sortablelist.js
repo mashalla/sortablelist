@@ -136,6 +136,6 @@ var SortableList = new Class({
             /* Move focus down */
             next.slFocus();
         }
-    },
+    }
        
 });
