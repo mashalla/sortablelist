@@ -7,6 +7,8 @@ license: MIT-style license.
 
 authors: Boris Wetzel
 
+provides: [SortableList]
+
 ...
 */
 
