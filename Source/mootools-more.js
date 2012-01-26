@@ -1,6 +1,3 @@
-// MooTools: the javascript framework.
-// Load this file's selection again by visiting: http://mootools.net/more/d023e266f8471120e424cc18ce8dc42b 
-// Or build this file again with packager using: packager build More/Sortables
 /*
 ---
 
